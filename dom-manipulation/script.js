@@ -28,7 +28,7 @@ function displayRandomQuote() {
     : quotes.filter(q => q.category === selectedCategory);
 
   if (filtered.length === 0) {
-    quoteDisplay.innerHTML = "No quotes available in this category.";
+    quoteDisplay.textContent = "No quotes available in this category.";
     return;
   }
 
