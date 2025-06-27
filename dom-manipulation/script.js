@@ -25,7 +25,7 @@ function updateCategoryOptions() {
 }
 
 // Show a random quote from selected category
-function showRandomQuote() {
+function  displayRandomQuote() {
   const selectedCategory = categorySelect.value;
   const filteredQuotes = selectedCategory === "all"
     ? quotes
@@ -84,9 +84,9 @@ function addQuote() {
 }
 
 // Event Listeners
-newQuoteBtn.addEventListener('click', showRandomQuote);
+newQuoteBtn.addEventListener('click',  displayRandomQuote);
 document.addEventListener('DOMContentLoaded', () => {
   updateCategoryOptions();
   createAddQuoteForm();
-  showRandomQuote();
+  displayRandomQuote();
 });
