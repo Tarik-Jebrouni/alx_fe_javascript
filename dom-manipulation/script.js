@@ -21,7 +21,7 @@ function updateCategoryOptions() {
   });
 }
 
-function displayRandomQuote() {
+function displayRandomQuote () {
   const selectedCategory = categorySelect.value;
   const filtered = selectedCategory === "all"
     ? quotes
