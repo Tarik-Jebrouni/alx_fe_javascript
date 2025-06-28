@@ -8,6 +8,13 @@ const quoteDisplay = document.getElementById('quoteDisplay');
 const newQuoteBtn = document.getElementById('newQuote');
 const categorySelect = document.getElementById('categorySelect');
 const quoteFormContainer = document.getElementById('quoteFormContainer');
+newQuoteBtn.addEventListener('click', displayRandomQuote);
+
+document.addEventListener('DOMContentLoaded', () => {
+  updateCategoryOptions();
+  createAddQuoteForm();
+  displayRandomQuote();
+});
 
 function updateCategoryOptions() {
   const existingOptions = Array.from(categorySelect.options).map(opt => opt.value);
@@ -21,7 +28,7 @@ function updateCategoryOptions() {
   });
 }
 
-function showRandomQuote () {
+function displayRandomQuote () {
   const selectedCategory = categorySelect.value;
   const filtered = selectedCategory === "all"
     ? quotes
@@ -75,10 +82,3 @@ function addQuote() {
   alert("New quote added!");
 }
 
-newQuoteBtn.addEventListener('click', showRandomQuote);
-
-document.addEventListener('DOMContentLoaded', () => {
-  updateCategoryOptions();
-  createAddQuoteForm();
-  showRandomQuote();
-});
