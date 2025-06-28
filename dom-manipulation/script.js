@@ -21,7 +21,7 @@ function updateCategoryOptions() {
   });
 }
 
-function displayRandomQuote () {
+function showRandomQuote () {
   const selectedCategory = categorySelect.value;
   const filtered = selectedCategory === "all"
     ? quotes
@@ -75,10 +75,10 @@ function addQuote() {
   alert("New quote added!");
 }
 
-newQuoteBtn.addEventListener('click', displayRandomQuote);
+newQuoteBtn.addEventListener('click', showRandomQuote);
 
 document.addEventListener('DOMContentLoaded', () => {
   updateCategoryOptions();
   createAddQuoteForm();
-  displayRandomQuote();
+  showRandomQuote();
 });
