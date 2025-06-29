@@ -1,91 +1,62 @@
-// Quotes array with text and category
-let quotes = [
-  { text: "The best way to get started is to quit talking and begin doing.", category: "Motivation" },
-  { text: "Life is what happens when you're busy making other plans.", category: "Life" },
-  { text: "You miss 100% of the shots you don’t take.", category: "Motivation" },
-  { text: "Be yourself; everyone else is already taken.", category: "Wisdom" }
+// 1. Sample Structure for Quotes (if not already defined):
+let quotes = JSON.parse(localStorage.getItem("quotes")) || [
+  { text: "Be yourself; everyone else is already taken.", category: "Inspiration" },
+  { text: "Two things are infinite: the universe and human stupidity.", category: "Humor" },
 ];
 
-const quoteDisplay = document.getElementById("quoteDisplay");
-const newQuoteBtn = document.getElementById("newQuote");  
-const addQuoteBtn = document.getElementById("addQuoteBtn");
-const categorySelect = document.getElementById("categorySelect");
+// 2. Populate Dropdown with Unique Categories
+function populateCategories() {
+  const dropdown = document.getElementById("categoryFilter");
+  const categories = ["all", ...new Set(quotes.map(q => q.category))];
+  dropdown.innerHTML = categories.map(cat => 
+    `<option value="${cat}">${cat}</option>`).join("");
 
-function createAddQuoteForm() {
-  const formContainer = document.getElementById("quoteFormContainer");
-
-  const formTitle = document.createElement("h3");
-  formTitle.textContent = "Add New Quote";
-
-  const quoteInput = document.createElement("input");
-  quoteInput.id = "newQuoteText";
-  quoteInput.type = "text";
-  quoteInput.placeholder = "Enter a new quote";
-
-  const categoryInput = document.createElement("input");
-  categoryInput.id = "newQuoteCategory";
-  categoryInput.type = "text";
-  categoryInput.placeholder = "Enter quote category";
-
-  const addBtn = document.createElement("button");
-  addBtn.textContent = "Add Quote";
-  addBtn.id = "addQuoteBtn";
-  addBtn.addEventListener("click", addQuote);
-
-  // Append elements to the container
-  formContainer.appendChild(formTitle);
-  formContainer.appendChild(quoteInput);
-  formContainer.appendChild(categoryInput);
-  formContainer.appendChild(addBtn);
+  // Restore last selected category
+  const savedCategory = localStorage.getItem("selectedCategory");
+  if (savedCategory) {
+    dropdown.value = savedCategory;
+    filterQuotes();
+  }
 }
 
-// Show a random quote from the selected category
-function showRandomQuote() {
-  const selectedCategory = categorySelect.value;
-  const filteredQuotes = selectedCategory === "all"
+// 3. Filtering Quotes by Selected Category
+function filterQuotes() {
+  const selectedCategory = document.getElementById("categoryFilter").value;
+  localStorage.setItem("selectedCategory", selectedCategory);
+
+  const filtered = selectedCategory === "all"
     ? quotes
-    : quotes.filter(quote => quote.category.toLowerCase() === selectedCategory.toLowerCase());
+    : quotes.filter(q => q.category === selectedCategory);
 
-  if (filteredQuotes.length === 0) {
-    quoteDisplay.textContent = "No quotes found for this category.";
-    return;
+  if(!selectedCategory){
+    displayQuotes(filtered);
   }
-
-  const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
-  quoteDisplay.textContent = `"${filteredQuotes[randomIndex].text}" — ${filteredQuotes[randomIndex].category}`;
 }
 
-// Add a new quote
-function addQuote() {
-  const newText = document.getElementById("newQuoteText").value.trim();
-  const newCategory = document.getElementById("newQuoteCategory").value.trim();
-
-  if (!newText || !newCategory) {
-    alert("Please enter both quote text and category.");
-    return;
-  }
-
-  const newQuote = { text: newText, category: newCategory };
-  quotes.push(newQuote);
-  updateCategoryDropdown();
-  document.getElementById("newQuoteText").value = '';
-  document.getElementById("newQuoteCategory").value = '';
-  alert("Quote added!");
+// 4. Display Quotes Function
+function displayQuotes(quotesToDisplay) {
+  const displayDiv = document.getElementById("quoteDisplay");
+  displayDiv.innerHTML = quotesToDisplay.map(q => `
+    <div class="quote-card">
+      <p>${q.text}</p>
+      <small>${q.category}</small>
+    </div>`).join("");
 }
 
-// Update dropdown with unique categories
-function updateCategoryDropdown() {
-  const categories = [...new Set(quotes.map(q => q.category))];
-  categorySelect.innerHTML = `<option value="all">All</option>`;
-  categories.forEach(cat => {
-    const option = document.createElement("option");
-    option.value = cat.toLowerCase();
-    option.textContent = cat;
-    categorySelect.appendChild(option);
-  });
+// 3: Add Quotes with Category Support
+function addQuote(text, category) {
+  quotes.push({ text, category });
+  localStorage.setItem("quotes", JSON.stringify(quotes));
+
+  // Update categories in dropdown
+  populateCategories();
+
+  // Refresh quote list
+  filterQuotes();
 }
 
-// Initial setup
-updateCategoryDropdown();
-createAddQuoteForm(); // ✅ Create the form dynamically
-newQuoteBtn.addEventListener("click", showRandomQuote);
+// On Page Load 
+window.onload = () => {
+  populateCategories();
+  filterQuotes();
+};
