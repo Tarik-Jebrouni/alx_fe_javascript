@@ -1,70 +1,89 @@
-let quotes = JSON.parse(localStorage.getItem("quotes")) || [
-  "Be yourself; everyone else is already taken.",
-  "The only limit to our realization of tomorrow is our doubts of today.",
-];
+let quotes = [];
+let lastViewedQuote = null;
 
-// Save quotes to local storage ✅
-function saveQuotes() {
-  localStorage.setItem("quotes", JSON.stringify(quotes));
-}
-// Add New Quote and Save: ✅
-function addQuote(newQuote) {
-  if (newQuote.trim() === "") return;
-  quotes.push(newQuote);
-  saveQuotes();
-  displayQuote(newQuote);
-}
-
-// Load Last Viewed Quote (Session Storage): ✅
-function loadLastViewedQuote() { 
-  const lastQuote = sessionStorage.getItem("lastQuote");
-  if (lastQuote) {
-    displayQuote(lastQuote);
+function loadQuotes() {
+  const storedQuotes = localStorage.getItem('quotes');
+  if (storedQuotes) {
+    quotes = JSON.parse(storedQuotes);
   } else {
-    displayQuote(quotes[0]);
+    quotes = [
+      "The only limit to our realization of tomorrow is our doubts of today.",
+      "Do what you can, with what you have, where you are.",
+    ];
+    saveQuotes();
   }
 }
-// Export Function ✅
+
+function saveQuotes() {
+  localStorage.setItem('quotes', JSON.stringify(quotes));
+}
+
+function showRandomQuote() {
+  if (quotes.length === 0) {
+    alert("No quotes available.");
+    return;
+  }
+  const index = Math.floor(Math.random() * quotes.length);
+  const quote = quotes[index];
+  document.getElementById('quoteDisplay').textContent = quote;
+  sessionStorage.setItem('lastViewedQuote', quote); // Session storage
+}
+
+function addQuote() {
+  const input = document.getElementById('newQuoteInput');
+  const newQuote = input.value.trim();
+  if (newQuote) {
+    quotes.push(newQuote);
+    saveQuotes();
+    input.value = '';
+    alert("Quote added!");
+  }
+}
+
 function exportToJsonFile() {
-  const blob = new Blob([JSON.stringify(quotes, null, 2)], { type: "application/json" });
+  const dataStr = JSON.stringify(quotes, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
+  
+  const a = document.createElement('a');
   a.href = url;
-  a.download = "quotes.json";
+  a.download = 'quotes.json';
   a.click();
+
   URL.revokeObjectURL(url);
 }
-// Import Function ✅
+
 function importFromJsonFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
   const fileReader = new FileReader();
-  fileReader.onload = function (e) {
+  fileReader.onload = function(e) {
     try {
       const importedQuotes = JSON.parse(e.target.result);
       if (Array.isArray(importedQuotes)) {
         quotes.push(...importedQuotes);
         saveQuotes();
-        alert("Quotes imported successfully!");
+        alert('Quotes imported successfully!');
       } else {
-        alert("Invalid file format");
+        alert('Invalid file format. Must be an array of quotes.');
       }
     } catch (err) {
-      alert("Failed to import quotes.");
+      alert('Error reading file: ' + err.message);
     }
   };
-  fileReader.readAsText(event.target.files[0]);
-}
-//  Display Function and Initialization ✅
-function displayQuote(quote) {
-  document.getElementById("quoteDisplay").textContent = quote;
-  sessionStorage.setItem("lastQuote", quote);
+  fileReader.readAsText(file);
 }
 
-function getRandomQuote() {
-  const random = quotes[Math.floor(Math.random() * quotes.length)];
-  displayQuote(random);
+function restoreSessionQuote() {
+  const last = sessionStorage.getItem('lastViewedQuote');
+  if (last) {
+    document.getElementById('quoteDisplay').textContent = last;
+  }
 }
 
-window.onload = function () {
-  loadLastViewedQuote();
-};
-
+// Initialize app
+document.addEventListener('DOMContentLoaded', () => {
+  loadQuotes();
+  restoreSessionQuote();
+});
