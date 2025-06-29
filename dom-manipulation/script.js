@@ -7,9 +7,37 @@ let quotes = [
 ];
 
 const quoteDisplay = document.getElementById("quoteDisplay");
-const newQuoteBtn = document.getElementById("newQuote");
+const newQuoteBtn = document.getElementById("newQuote");  
 const addQuoteBtn = document.getElementById("addQuoteBtn");
 const categorySelect = document.getElementById("categorySelect");
+
+function createAddQuoteForm() {
+  const formContainer = document.getElementById("quoteFormContainer");
+
+  const formTitle = document.createElement("h3");
+  formTitle.textContent = "Add New Quote";
+
+  const quoteInput = document.createElement("input");
+  quoteInput.id = "newQuoteText";
+  quoteInput.type = "text";
+  quoteInput.placeholder = "Enter a new quote";
+
+  const categoryInput = document.createElement("input");
+  categoryInput.id = "newQuoteCategory";
+  categoryInput.type = "text";
+  categoryInput.placeholder = "Enter quote category";
+
+  const addBtn = document.createElement("button");
+  addBtn.textContent = "Add Quote";
+  addBtn.id = "addQuoteBtn";
+  addBtn.addEventListener("click", addQuote);
+
+  // Append elements to the container
+  formContainer.appendChild(formTitle);
+  formContainer.appendChild(quoteInput);
+  formContainer.appendChild(categoryInput);
+  formContainer.appendChild(addBtn);
+}
 
 // Show a random quote from the selected category
 function showRandomQuote() {
@@ -59,5 +87,5 @@ function updateCategoryDropdown() {
 
 // Initial setup
 updateCategoryDropdown();
+createAddQuoteForm(); // ✅ Create the form dynamically
 newQuoteBtn.addEventListener("click", showRandomQuote);
-addQuoteBtn.addEventListener("click", addQuote);
