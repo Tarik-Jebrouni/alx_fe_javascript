@@ -2,13 +2,15 @@
   "quotes": [
     {
       "id": 1,
-      "text": "Be yourself; everyone else is already taken.",
-      "updatedAt": "2025-07-01T10:00:00Z"
+      "text": "Stay hungry, stay foolish.",
+      "author": "Steve Jobs",
+      "updatedAt": "2025-06-30T12:00:00Z"
     },
     {
       "id": 2,
-      "text": "Stay hungry, stay foolish.",
-      "updatedAt": "2025-07-01T11:00:00Z"
+      "text": "Be yourself; everyone else is already taken.",
+      "author": "Oscar Wilde",
+      "updatedAt": "2025-06-28T10:00:00Z"
     }
   ]
 }

@@ -1,75 +1,82 @@
- const quoteDisplay = document.getElementById('quote-display');
-const newQuoteBtn = document.getElementById('new-quote-btn');
-const notification = document.getElementById('notification');
+const quoteText = document.getElementById("quote-text");
+const quoteAuthor = document.getElementById("quote-author");
+const nextQuoteBtn = document.getElementById("next-quote");
+const syncNotice = document.getElementById("sync-notice");
 
-const SERVER_URL = 'http://localhost:3000/quotes'; // Use your own mock server URL
+const SERVER_URL = "http://localhost:3000/quotes"; // replace with your mock server URL
 
-// Load local quote
-function loadQuote() {
-  const quotes = JSON.parse(localStorage.getItem('quotes')) || [];
-  const random = quotes[Math.floor(Math.random() * quotes.length)];
-  quoteDisplay.textContent = random ? random.text : 'No quotes available.';
+// Initial load
+let localQuotes = JSON.parse(localStorage.getItem("quotes") || "[]");
+let currentIndex = 0;
+
+function displayQuote(index) {
+  if (localQuotes.length > 0 && localQuotes[index]) {
+    const quote = localQuotes[index];
+    quoteText.textContent = quote.text;
+    quoteAuthor.textContent = `— ${quote.author}`;
+  }
 }
 
-// Fetch new quote from server
-async function fetchQuotes() {
+function nextQuote() {
+  currentIndex = (currentIndex + 1) % localQuotes.length;
+  displayQuote(currentIndex);
+}
+
+// Fetch from server
+async function fetchServerQuotes() {
+  const res = await fetch(SERVER_URL);
+  const serverQuotes = await res.json();
+  return serverQuotes;
+}
+
+function mergeQuotes(serverQuotes) {
+  const updated = [];
+  const localMap = new Map(localQuotes.map(q => [q.id, q]));
+
+  serverQuotes.forEach(serverQuote => {
+    const local = localMap.get(serverQuote.id);
+    if (!local || new Date(serverQuote.updatedAt) > new Date(local.updatedAt)) {
+      updated.push(serverQuote); // server wins
+    } else {
+      updated.push(local);
+    }
+    localMap.delete(serverQuote.id);
+  });
+
+  // Add any local-only quotes
+  for (const remaining of localMap.values()) {
+    updated.push(remaining);
+  }
+
+  localStorage.setItem("quotes", JSON.stringify(updated));
+  localQuotes = updated;
+  currentIndex = 0;
+  displayQuote(currentIndex);
+  showSyncNotice();
+}
+
+function showSyncNotice() {
+  syncNotice.classList.remove("hidden");
+  setTimeout(() => syncNotice.classList.add("hidden"), 4000);
+}
+
+// Periodic sync every 10 seconds
+setInterval(async () => {
   try {
-    const res = await fetch(SERVER_URL);
-    const serverQuotes = await res.json();
-    const localQuotes = JSON.parse(localStorage.getItem('quotes')) || [];
-
-    let hasUpdate = false;
-
-    const mergedQuotes = serverQuotes.map(serverQ => {
-      const localQ = localQuotes.find(q => q.id === serverQ.id);
-      if (!localQ || new Date(serverQ.updatedAt) > new Date(localQ.updatedAt)) {
-        hasUpdate = true;
-        notify(`Updated quote: "${serverQ.text}"`);
-        return serverQ;
-      }
-      return localQ;
-    });
-
-    localStorage.setItem('quotes', JSON.stringify(mergedQuotes));
-    if (hasUpdate) loadQuote();
-  } catch (err) {
-    console.error('Sync error:', err);
-    notify('Failed to sync with server.');
+    const serverQuotes = await fetchServerQuotes();
+    mergeQuotes(serverQuotes);
+  } catch (e) {
+    console.warn("Server sync failed", e);
   }
+}, 10000);
+
+// Initialize app
+if (localQuotes.length > 0) {
+  displayQuote(currentIndex);
+} else {
+  fetchServerQuotes().then(serverQuotes => {
+    mergeQuotes(serverQuotes);
+  });
 }
 
-// Add new quote manually
-newQuoteBtn.addEventListener('click', () => {
-  const quotes = JSON.parse(localStorage.getItem('quotes')) || [];
-  const newQuote = prompt('Enter a new quote:');
-  if (newQuote) {
-    const quoteObj = {
-      id: Date.now(),
-      text: newQuote,
-      updatedAt: new Date().toISOString()
-    };
-    quotes.push(quoteObj);
-    localStorage.setItem('quotes', JSON.stringify(quotes));
-    loadQuote();
-
-    // Optional: Simulate POST to server
-    fetch(SERVER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(quoteObj)
-    }).catch(() => notify('Failed to save to server.'));
-  }
-});
-
-// Display notification
-function notify(msg) {
-  notification.textContent = msg;
-  setTimeout(() => notification.textContent = '', 4000);
-}
-
-// Periodic sync
-setInterval(fetchQuotes, 60000); // every 60s
-window.onload = () => {
-  fetchQuotes();
-  loadQuote();
-};
+nextQuoteBtn.addEventListener("click", nextQuote);
