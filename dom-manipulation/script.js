@@ -23,11 +23,21 @@ function nextQuote() {
 }
 
 // Fetch from server
-async function fetchServerQuotes() {
-  const res = await fetch(SERVER_URL);
-  const serverQuotes = await res.json();
-  return serverQuotes;
+
+async function fetchQuotesFromServer() {
+  try {
+    const response = await fetch(SERVER_URL);
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch quotes from server:", error);
+    return [];
+  }
 }
+
 
 function mergeQuotes(serverQuotes) {
   const updated = [];
