@@ -72,7 +72,7 @@ function saveQuotesToStorage() {
   localStorage.setItem("quotes", JSON.stringify(quotes));
 }
 
-function lloadQuotesFromStorage {
+function loadQuotesFromStorage() {
   const stored = localStorage.getItem("quotes");
   if (stored) {
     quotes = JSON.parse(stored);
