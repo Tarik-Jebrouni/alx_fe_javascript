@@ -1,26 +1,23 @@
 // Quotes array with text and category
 let quotes = [
-  { text: "The best way to predict the future is to create it.", category: "Motivation" },
-  { text: "Life is what happens when you’re busy making other plans.", category: "Life" },
-  { text: "Innovation distinguishes between a leader and a follower.", category: "Innovation" }
+  { text: "Be yourself; everyone else is already taken.", category: "Inspiration" },
+  { text: "Life is what happens when you’re busy making other plans.", category: "Life" }
 ];
 
 
 // Extract unique categories and populate the <select>:
 function populateCategories() {
-  const categoryFilter = document.getElementById("categoryFilter");
   const categories = ["all", ...new Set(quotes.map(q => q.category))];
+  const dropdown = document.getElementById("categoryFilter");
 
-  categoryFilter.innerHTML = categories
-    .map(cat => `<option value="${cat}">${cat}</option>`)
-    .join("");
+  dropdown.innerHTML = categories.map(
+    cat => `<option value="${cat}">${cat}</option>`
+  ).join("");
 
-  const savedCategory = localStorage.getItem("selectedCategory");
-  if (savedCategory) {
-    categoryFilter.value = savedCategory;
-  }
+  const saved = localStorage.getItem("selectedCategory");
+  if (saved) dropdown.value = saved;
 
-  filterQuotes(); // Initial render
+  filterQuotes();
 }
 
 
@@ -36,16 +33,11 @@ function filterQuotes() {
   displayQuotes(filtered);
 }
 
-
-
 // Render quotes dynamically:
-function displayQuotes(quotesToDisplay) {
+function displayQuotes(filtered) {
   const container = document.getElementById("quoteContainer");
-  container.innerHTML = quotesToDisplay
-    .map(q => `<p>${q.text}</p>`)
-    .join("");
+  container.innerHTML = filtered.map(q => `<p>${q.text}</p>`).join("");
 }
-
 
 // When adding a new quote, update both the array and dropdown:
 function addQuote(text, category) {
