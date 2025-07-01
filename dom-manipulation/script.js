@@ -53,7 +53,11 @@ function filterQuotes() {
 
 
 
- 
+// Render quotes dynamically:
+function displayQuotes(filtered) {
+  const container = document.getElementById("quoteContainer");
+  container.innerHTML = filtered.map(q => `<p>${q.text}</p>`).join("");
+}
 
 // When adding a new quote, update both the array and dropdown:
 function addQuote(text, author, category) {
@@ -63,7 +67,17 @@ function addQuote(text, author, category) {
 }
 
 
+// Besides the selected filter, you can persist the quotes array itself:
+function saveQuotesToStorage() {
+  localStorage.setItem("quotes", JSON.stringify(quotes));
+}
 
+function loadQuotesFromStorage() {
+  const stored = localStorage.getItem("quotes");
+  if (stored) {
+    quotes = JSON.parse(stored);
+  }
+}
 
 window.onload = () => {
   populateCategories();
