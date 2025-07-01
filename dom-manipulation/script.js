@@ -14,8 +14,11 @@ function populateCategories() {
     cat => `<option value="${cat}">${cat}</option>`
   ).join("");
 
-  const saved = localStorage.getItem("selectedCategory");
-  if (saved) dropdown.value = saved;
+  const savedCategory = localStorage.getItem("selectedCategory");
+  if (savedCategory) {
+    document.getElementById("categoryFilter").value = savedCategory;
+    filterQuotes(); // apply saved filter
+  }
 
   filterQuotes();
 }
@@ -24,14 +27,14 @@ function populateCategories() {
 // Filter and display quotes according to the selected category:
 function filterQuotes() {
   const selectedCategory = document.getElementById("categoryFilter").value;
-  localStorage.setItem("selectedCategory", selectedCategory);
-
   const filtered = selectedCategory === "all"
     ? quotes
     : quotes.filter(q => q.category === selectedCategory);
+  localStorage.setItem("selectedCategory", selectedCategory);
 
   displayQuotes(filtered);
 }
+
 
 // Render quotes dynamically:
 function displayQuotes(filtered) {
@@ -45,7 +48,7 @@ function addQuote(text, category) {
 
   // If new category, update dropdown
   if (![...document.getElementById("categoryFilter").options]
-      .some(opt => opt.value === category)) {
+    .some(opt => opt.value === category)) {
     const option = document.createElement("option");
     option.value = category;
     option.textContent = category;
