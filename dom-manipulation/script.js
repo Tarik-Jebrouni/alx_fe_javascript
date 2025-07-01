@@ -81,23 +81,16 @@ function showSyncNotice() {
 }
 
 // Periodic sync every 10 seconds
-setInterval(async () => {
-  try {
-    const serverQuotes = await fetchServerQuotes();
-    mergeQuotes(serverQuotes);
-  } catch (e) {
-    console.warn("Server sync failed", e);
-  }
-}, 10000);
+setInterval(syncQuotes, 10000);
+
 
 // Initialize app
 if (localQuotes.length > 0) {
   displayQuote(currentIndex);
 } else {
-  fetchServerQuotes().then(serverQuotes => {
-    mergeQuotes(serverQuotes);
-  });
+  syncQuotes(); // pulls from server and updates local
 }
+
 
 async function postQuoteToServer(quote) {
   try {
@@ -141,5 +134,13 @@ document.getElementById("submit-quote").addEventListener("click", async () => {
     displayQuote(localQuotes.length - 1);
   }
 });
+async function syncQuotes() {
+  try {
+    const serverQuotes = await fetchQuotesFromServer();
+    mergeQuotes(serverQuotes);
+  } catch (error) {
+    console.warn("Quote sync failed:", error);
+  }
+}
 
 nextQuoteBtn.addEventListener("click", nextQuote);
