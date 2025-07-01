@@ -1,62 +1,68 @@
-// 1. Sample Structure for Quotes (if not already defined):
-let quotes = JSON.parse(localStorage.getItem("quotes")) || [
-  { text: "Be yourself; everyone else is already taken.", category: "Inspiration" },
-  { text: "Two things are infinite: the universe and human stupidity.", category: "Humor" },
+// Quotes array with text and category
+const quotes = [
+  { text: "Believe in yourself.", author: "Unknown", category: "Motivation" },
+  { text: "Simplicity is the soul of efficiency.", author: "Austin Freeman", category: "Productivity" },
+  // Add more quotes...
 ];
 
-// 2. Populate Dropdown with Unique Categories
+// Extract unique categories and populate the <select>:
 function populateCategories() {
-  const dropdown = document.getElementById("categoryFilter");
-  const categories = ["all", ...new Set(quotes.map(q => q.category))];
-  dropdown.innerHTML = categories.map(cat => 
-    `<option value="${cat}">${cat}</option>`).join("");
+  const categorySet = new Set();
+  quotes.forEach(quote => categorySet.add(quote.category));
 
-  // Restore last selected category
-  const savedCategory = localStorage.getItem("selectedCategory");
-  if (savedCategory) {
-    dropdown.value = savedCategory;
+  const filter = document.getElementById('categoryFilter');
+  filter.innerHTML = '<option value="all">All Categories</option>';
+
+  categorySet.forEach(category => {
+    const option = document.createElement('option');
+    option.value = category;
+    option.textContent = category;
+    filter.appendChild(option);
+  });
+
+  // Restore last selected category from localStorage
+  const lastSelected = localStorage.getItem('selectedCategory');
+  if (lastSelected) {
+    filter.value = lastSelected;
     filterQuotes();
   }
 }
 
-// 3. Filtering Quotes by Selected Category
+// Filter and display quotes according to the selected category:
 function filterQuotes() {
-  const selectedCategory = document.getElementById("categoryFilter").value;
-  localStorage.setItem("selectedCategory", selectedCategory);
+  const selectedCategory = document.getElementById('categoryFilter').value;
+  localStorage.setItem('selectedCategory', selectedCategory); // Save choice
 
-  const filtered = selectedCategory === "all"
+  const filtered = selectedCategory === 'all'
     ? quotes
     : quotes.filter(q => q.category === selectedCategory);
 
-  if(!selectedCategory){
-    displayQuotes(filtered);
+  displayQuotes(filtered);
+}
+
+// Render quotes dynamically:
+function displayQuotes(quotesArray) {
+  const container = document.getElementById('quoteContainer');
+  container.innerHTML = ''; // Clear previous
+
+  quotesArray.forEach(quote => {
+    const div = document.createElement('div');
+    div.className = 'quote';
+    div.innerHTML = `<p>"${quote.text}"</p><p>– ${quote.author}</p>`;
+    container.appendChild(div);
+  });
+}
+
+// When adding a new quote, update both the array and dropdown:
+function addQuote(text, author, category) {
+  quotes.push({ text, author, category });
+
+  if (![...document.getElementById('categoryFilter').options].some(opt => opt.value === category)) {
+    const option = document.createElement('option');
+    option.value = category;
+    option.textContent = category;
+    document.getElementById('categoryFilter').appendChild(option);
   }
+
+  filterQuotes(); // Refresh display
 }
-
-// 4. Display Quotes Function
-function displayQuotes(quotesToDisplay) {
-  const displayDiv = document.getElementById("quoteDisplay");
-  displayDiv.innerHTML = quotesToDisplay.map(q => `
-    <div class="quote-card">
-      <p>${q.text}</p>
-      <small>${q.category}</small>
-    </div>`).join("");
-}
-
-// 3: Add Quotes with Category Support
-function addQuote(text, category) {
-  quotes.push({ text, category });
-  localStorage.setItem("quotes", JSON.stringify(quotes));
-
-  // Update categories in dropdown
-  populateCategories();
-
-  // Refresh quote list
-  filterQuotes();
-}
-
-// On Page Load 
-window.onload = () => {
-  populateCategories();
-  filterQuotes();
-};
