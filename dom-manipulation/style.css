@@ -44,3 +44,34 @@ button {
 .hidden {
   display: none;
 }
+/* New quote submission form styling */
+#new-quote-form {
+  margin-top: 30px;
+  padding: 15px;
+  border-top: 1px solid #ddd;
+}
+
+#new-quote-form input[type="text"] {
+  width: 90%;
+  padding: 10px;
+  margin: 8px 0;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+#submit-quote {
+  padding: 10px 25px;
+  font-size: 1rem;
+  margin-top: 10px;
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#submit-quote:hover {
+  background-color: #005fa3;
+}

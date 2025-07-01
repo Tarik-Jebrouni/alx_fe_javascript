@@ -99,4 +99,47 @@ if (localQuotes.length > 0) {
   });
 }
 
+async function postQuoteToServer(quote) {
+  try {
+    const response = await fetch(SERVER_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(quote)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to post quote: ${response.status}`);
+    }
+
+    const savedQuote = await response.json();
+    console.log("Quote posted:", savedQuote);
+    return savedQuote;
+  } catch (error) {
+    console.error("Error posting quote:", error);
+  }
+}
+document.getElementById("submit-quote").addEventListener("click", async () => {
+  const text = document.getElementById("new-quote-text").value.trim();
+  const author = document.getElementById("new-quote-author").value.trim();
+
+  if (!text || !author) return alert("Please enter both text and author.");
+
+  const newQuote = {
+    text,
+    author,
+    updatedAt: new Date().toISOString()
+  };
+
+  const posted = await postQuoteToServer(newQuote);
+
+  // Optional: Update local storage with new quote
+  if (posted) {
+    localQuotes.push(posted);
+    localStorage.setItem("quotes", JSON.stringify(localQuotes));
+    displayQuote(localQuotes.length - 1);
+  }
+});
+
 nextQuoteBtn.addEventListener("click", nextQuote);

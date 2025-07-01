@@ -1,21 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dynamic Quote Generator</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="container">
-    <h1>Dynamic Quote Generator</h1>
-    <div id="quote-box">
-      <p id="quote-text">Loading...</p>
-      <p id="quote-author"></p>
-    </div>
-    <button id="next-quote">Next Quote</button>
-    <p id="sync-notice" class="hidden">Quotes synced with server. Conflicts resolved.</p>
-  </div>
-  <script src="script.js"></script>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dynamic Quote Generator</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div class="container">
+            <div id="new-quote-form">
+                <h3>Submit a New Quote</h3>
+                <input type="text" id="new-quote-text"
+                    placeholder="Enter quote text" />
+                <input type="text" id="new-quote-author"
+                    placeholder="Enter author" />
+                <br />
+                <button id="submit-quote">Submit Quote</button>
+            </div>
+
+            <h1>Dynamic Quote Generator</h1>
+            <div id="quote-box">
+                <p id="quote-text">Loading...</p>
+                <p id="quote-author"></p>
+            </div>
+            <button id="next-quote">Next Quote</button>
+            <p id="sync-notice" class="hidden">Quotes synced with server.
+                Conflicts resolved.</p>
+        </div>
+
+        <script src="script.js"></script>
+    </body>
 </html>
