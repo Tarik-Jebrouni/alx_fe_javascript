@@ -76,6 +76,7 @@ function mergeQuotes(serverQuotes) {
 }
 
 function showSyncNotice() {
+  syncNotice.textContent = "Quotes synced with server!";
   syncNotice.classList.remove("hidden");
   setTimeout(() => syncNotice.classList.add("hidden"), 4000);
 }
