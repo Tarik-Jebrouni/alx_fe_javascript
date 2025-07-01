@@ -3,7 +3,7 @@ const quoteAuthor = document.getElementById("quote-author");
 const nextQuoteBtn = document.getElementById("next-quote");
 const syncNotice = document.getElementById("sync-notice");
 
-const SERVER_URL = "http://localhost:3000/quotes"; // replace with your mock server URL
+const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
 
 // Initial load
 let localQuotes = JSON.parse(localStorage.getItem("quotes") || "[]");
@@ -30,13 +30,23 @@ async function fetchQuotesFromServer() {
     if (!response.ok) {
       throw new Error(`Server error: ${response.status}`);
     }
-    const data = await response.json();
-    return data;
+    const posts = await response.json();
+
+    // Simulate quotes from the posts
+    const quotes = posts.slice(0, 10).map(post => ({
+      id: post.id,
+      text: post.body,
+      author: `User ${post.userId}`,
+      updatedAt: new Date().toISOString() // simulate recent updates
+    }));
+
+    return quotes;
   } catch (error) {
     console.error("Failed to fetch quotes from server:", error);
     return [];
   }
 }
+
 
 
 function mergeQuotes(serverQuotes) {
