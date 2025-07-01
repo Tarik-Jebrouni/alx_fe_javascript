@@ -8,12 +8,17 @@ const quotes = [
 // Extract unique categories and populate the <select>:
 function populateCategories() {
   const categorySet = new Set();
-  quotes.forEach(quote => categorySet.add(quote.category));
+
+  // Extract unique categories
+  quotes.forEach(function(quote) {
+    categorySet.add(quote.category);
+  });
 
   const filter = document.getElementById('categoryFilter');
   filter.innerHTML = '<option value="all">All Categories</option>';
 
-  categorySet.forEach(category => {
+  // Populate dropdown
+  categorySet.forEach(function(category) {
     const option = document.createElement('option');
     option.value = category;
     option.textContent = category;
@@ -24,9 +29,10 @@ function populateCategories() {
   const lastSelected = localStorage.getItem('selectedCategory');
   if (lastSelected) {
     filter.value = lastSelected;
-    filterQuotes();
+    filterQuotes(); // Refresh display with saved filter
   }
 }
+
 
 // Filter and display quotes according to the selected category:
 function filterQuotes() {
