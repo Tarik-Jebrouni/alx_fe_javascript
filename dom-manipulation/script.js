@@ -81,4 +81,5 @@ function loadQuotesFromStorage() {
 
 window.onload = () => {
   populateCategories();
+  filterQuotes();
 };
