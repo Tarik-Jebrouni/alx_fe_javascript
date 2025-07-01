@@ -37,6 +37,7 @@ function filterQuotes() {
 }
 
 
+
 // Render quotes dynamically:
 function displayQuotes(quotesToDisplay) {
   const container = document.getElementById("quoteContainer");
