@@ -1,0 +1,106 @@
+ /* General body styles */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: #f7f9fb;
+  color: #333;
+}
+
+/* Container for the whole app */
+#appContainer {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* Filter dropdown */
+#categoryFilter {
+  padding: 8px 12px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-bottom: 20px;
+  outline: none;
+  background-color: #fff;
+  transition: border-color 0.3s ease;
+}
+
+#categoryFilter:hover,
+#categoryFilter:focus {
+  border-color: #007bff;
+}
+
+/* Quote container */
+#quoteContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Each individual quote */
+.quote {
+  background: #e8f0fe;
+  padding: 15px 20px;
+  border-radius: 10px;
+  border-left: 5px solid #4285f4;
+  transition: background 0.3s ease;
+}
+
+.quote:hover {
+  background: #d2e3fc;
+}
+
+.quote p {
+  margin: 5px 0;
+  line-height: 1.5;
+}
+
+.quote p:first-child {
+  font-style: italic;
+  font-size: 1.1rem;
+}
+
+.quote p:last-child {
+  text-align: right;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Add quote form (if applicable) */
+#addQuoteForm input,
+#addQuoteForm select,
+#addQuoteForm button {
+  padding: 8px;
+  margin-top: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+#addQuoteForm button {
+  background-color: #4285f4;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#addQuoteForm button:hover {
+  background-color: #3367d6;
+}
+
+/* Responsive behavior */
+@media (max-width: 600px) {
+  #appContainer {
+    padding: 15px;
+  }
+
+  .quote {
+    font-size: 0.95rem;
+  }
+}
