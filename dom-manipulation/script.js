@@ -9,16 +9,27 @@ let quotes = [
 // Extract unique categories and populate the <select>:
 function populateCategories() {
   const dropdown = document.getElementById('categoryFilter');
+
+  // Clear existing options
+  dropdown.innerHTML = '';
+
+  // Get unique categories and include 'all'
   const categories = ['all', ...new Set(quotes.map(q => q.category))];
 
-  dropdown.innerHTML = categories.map(cat =>
-    `<option value="${cat}">${cat}</option>`
-  ).join('');
+  // Create and append each option using appendChild
+  categories.forEach(cat => {
+    const option = document.createElement('option');
+    option.value = cat;
+    option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+    dropdown.appendChild(option);
+  });
 
   // Restore selected category from localStorage
   const savedCategory = localStorage.getItem('selectedCategory') || 'all';
   dropdown.value = savedCategory;
-  filterQuotes(); // Initial filter
+
+  // Filter quotes based on selected category
+  filterQuotes();
 }
 
 // Filter and display quotes according to the selected category:
