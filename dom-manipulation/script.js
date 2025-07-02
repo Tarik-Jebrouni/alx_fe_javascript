@@ -1,73 +1,56 @@
-// Quotes array with text and category
+// Tableau global des citations
 const quotes = [
-  { text: "The only limit is your mind.", category: "Motivation" },
-  { text: "Life is what happens when you're busy making other plans.", category: "Life" },
-  { text: "Knowledge is power.", category: "Education" }
+  { text: "La seule limite, c'est votre esprit.", category: "Motivation" },
+  { text: "La vie est ce qui se passe quand on fait d'autres projets.", category: "Vie" },
+  { text: "Le savoir est une arme.", category: "Éducation" }
 ];
 
-
-// Extract unique categories and populate the <select>:
+// Fonction pour remplir dynamiquement le menu des catégories
 function populateCategories() {
-  const categorySet = new Set(quotes.map(q => q.category));
   const select = document.getElementById('categoryFilter');
+  const categories = [...new Set(quotes.map(q => q.category))]; // Catégories uniques
 
-  // Clear existing options except 'All'
-  select.innerHTML = '<option value="all">All Categories</option>';
+  // Réinitialiser les options sauf "Toutes les catégories"
+  select.innerHTML = '<option value="all">Toutes les catégories</option>';
 
-  categorySet.forEach(category => {
+  // Ajouter les catégories
+  categories.forEach(category => {
     const option = document.createElement('option');
     option.value = category;
     option.textContent = category;
     select.appendChild(option);
   });
 
-  // Restore last filter if available
-  const savedFilter = localStorage.getItem('selectedCategory');
-  if (savedFilter) {
-    select.value = savedFilter;
-    filterQuotes();
-  }
-}
-
-
-// Filter and display quotes according to the selected category:
-function filterQuotes() {
-  const selectedCategory = document.getElementById('categoryFilter').value;
-  localStorage.setItem('selectedCategory', selectedCategory); // persist selection
-
-  const quoteContainer = document.getElementById('quoteContainer');
-  quoteContainer.innerHTML = ''; // clear existing quotes
-
-  const filteredQuotes = selectedCategory === 'all'
-    ? quotes
-    : quotes.filter(q => q.category === selectedCategory);
-
-  filteredQuotes.forEach(quote => {
-    const quoteEl = document.createElement('p');
-    quoteEl.textContent = quote.text;
-    quoteContainer.appendChild(quoteEl);
-  });
-}
-
-// Render quotes dynamically:
-function addQuote(text, category) {
-  quotes.push({ text, category });
-
-  // Refresh filter dropdown if new category is unique
-  const select = document.getElementById('categoryFilter');
-  if (![...select.options].some(opt => opt.value === category)) {
-    const option = document.createElement('option');
-    option.value = category;
-    option.textContent = category;
-    select.appendChild(option);
+  // Rétablir la catégorie précédemment sélectionnée
+  const savedCategory = localStorage.getItem('selectedCategory');
+  if (savedCategory) {
+    select.value = savedCategory;
   }
 
+  // Afficher les citations correspondantes
   filterQuotes();
 }
 
+// Fonction pour filtrer et afficher les citations
+function filterQuotes() {
+  const selectedCategory = document.getElementById('categoryFilter').value;
+  localStorage.setItem('selectedCategory', selectedCategory); // Sauvegarder le filtre
 
+  const container = document.getElementById('quoteContainer');
+  container.innerHTML = ''; // Nettoyer l'affichage
+
+  const filtered = selectedCategory === 'all'
+    ? quotes
+    : quotes.filter(q => q.category === selectedCategory);
+
+  filtered.forEach(quote => {
+    const p = document.createElement('p');
+    p.textContent = quote.text;
+    container.appendChild(p);
+  });
+}
+
+// Initialisation au chargement de la page
 window.onload = () => {
   populateCategories();
 };
-
- 
