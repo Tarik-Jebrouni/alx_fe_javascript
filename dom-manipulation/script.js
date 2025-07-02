@@ -42,10 +42,22 @@ function filterQuotes() {
     : quotes.filter(q => q.category === selectedCategory);
 
   const container = document.getElementById('quotesContainer');
-  container.innerHTML = filtered.map(q =>
-    `<div class="quote">${q.text} <em>(${q.category})</em></div>`
-  ).join('');
+  container.innerHTML = '';
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<p>No quotes found for this category.</p>';
+    return;
+  }
+
+  // Show one random quote
+  const randomQuote = filtered[Math.floor(Math.random() * filtered.length)];
+
+  const quoteDiv = document.createElement('div');
+  quoteDiv.className = 'quote';
+  quoteDiv.innerHTML = `${randomQuote.text} <em>(${randomQuote.category})</em>`;
+  container.appendChild(quoteDiv);
 }
+
 
 // Render quotes dynamically:
 function displayQuotes(filtered) {
