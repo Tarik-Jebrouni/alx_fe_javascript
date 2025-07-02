@@ -33,24 +33,21 @@ function populateCategories() {
 // Filter and display quotes according to the selected category:
 function filterQuotes() {
   const selectedCategory = document.getElementById('categoryFilter').value;
-  localStorage.setItem('selectedCategory', selectedCategory); // Save preference
+  localStorage.setItem('selectedCategory', selectedCategory); // persist selection
 
   const quoteContainer = document.getElementById('quoteContainer');
-  quoteContainer.innerHTML = '';
+  quoteContainer.innerHTML = ''; // clear existing quotes
 
-  const filtered = selectedCategory === 'all'
+  const filteredQuotes = selectedCategory === 'all'
     ? quotes
     : quotes.filter(q => q.category === selectedCategory);
 
-  filtered.forEach(quote => {
-    const p = document.createElement('p');
-    p.textContent = quote.text;
-    quoteContainer.appendChild(p);
+  filteredQuotes.forEach(quote => {
+    const quoteEl = document.createElement('p');
+    quoteEl.textContent = quote.text;
+    quoteContainer.appendChild(quoteEl);
   });
 }
-
-
- 
 
 // Render quotes dynamically:
 function addQuote(text, category) {
