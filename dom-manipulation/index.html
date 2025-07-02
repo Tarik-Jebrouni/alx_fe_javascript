@@ -1,78 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Dynamic Quote Generator with Sync</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
-    .quote-box { background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    #notification { background: #fffae6; padding: 10px; margin-bottom: 10px; border-left: 4px solid #f5c518; display: none; }
-    button { padding: 8px 12px; margin-top: 10px; }
-  </style>
-</head>
-<body>
-  <h1>Dynamic Quote Generator</h1>
-  <div id="notification"></div>
-  <div id="quotes"></div>
-  <button onclick="syncQuotes()">Sync Now</button>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dynamic Quote Generator</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <h1>Dynamic Quote Generator</h1>
 
-  <script>
-    const API_URL = 'https://jsonplaceholder.typicode.com/posts'; // Simulate quote API
+        <!-- Controls: Filter and Add New Quote -->
+        <div id="controls">
+            <!-- Category dropdown for filtering -->
+            <select id="categoryFilter" onchange="filterQuotes()">
+                <option value="all">All Categories</option>
+            </select>
+            <br><br>
+            <!-- Input fields for adding new quotes -->
+            <input type="text" id="newQuote" placeholder="Enter a quote">
+            <input type="text" id="newCategory" placeholder="Enter category">
+            <button onclick="addQuote()">Add Quote</button>
+        </div>
 
-    function showNotification(msg) {
-      const el = document.getElementById('notification');
-      el.innerText = msg;
-      el.style.display = 'block';
-      setTimeout(() => el.style.display = 'none', 5000);
-    }
-
-    function getLocalQuotes() {
-      return JSON.parse(localStorage.getItem('quotes') || '[]');
-    }
-
-    function saveToLocal(quotes) {
-      localStorage.setItem('quotes', JSON.stringify(quotes));
-    }
-
-    function renderQuotes() {
-      const container = document.getElementById('quotes');
-      container.innerHTML = '';
-      const quotes = getLocalQuotes();
-      quotes.forEach(q => {
-        const box = document.createElement('div');
-        box.className = 'quote-box';
-        box.innerText = q.title;
-        container.appendChild(box);
-      });
-    }
-
-    async function fetchServerQuotes() {
-      const res = await fetch(API_URL + '?_limit=5');
-      return await res.json();
-    }
-
-    async function syncQuotes() {
-      const serverQuotes = await fetchServerQuotes();
-      const localQuotes = getLocalQuotes();
-      let hasConflict = false;
-
-      const merged = serverQuotes.map(sq => {
-        const match = localQuotes.find(lq => lq.id === sq.id);
-        if (!match || match.updatedAt < sq.updatedAt) {
-          hasConflict = true;
-          return { ...sq, updatedAt: new Date().toISOString() };
-        }
-        return match;
-      });
-
-      saveToLocal(merged);
-      renderQuotes();
-      if (hasConflict) showNotification("Quotes updated from server due to conflict.");
-    }
-
-    // Initial render and periodic sync
-    renderQuotes();
-    setInterval(syncQuotes, 60000); // every 60 sec
-  </script>
-</body>
+        <!-- Quote display area -->
+        <div id="quoteContainer"></div>
+        <script src="script.js"></script>
+    </body>
 </html>
