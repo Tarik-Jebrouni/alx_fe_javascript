@@ -1,94 +1,98 @@
-// Initial list of quotes
+// Array to store all quotes with their respective categories
 let quotes = [
-    { text: "The only limit is your mind.", category: "Motivation" },
-    { text: "Do or do not, there is no try.", category: "Inspiration" },
-    { text: "Knowledge is power.", category: "Wisdom" },
+  { text: "The only limit is your mind.", category: "Motivation" },
+  { text: "Do or do not, there is no try.", category: "Inspiration" },
+  { text: "Knowledge is power.", category: "Wisdom" },
 ];
 
-// Populate the dropdown with unique categories
+// Populate the dropdown filter with unique categories from the quotes array
 function populateCategories() {
-    const categoryFilter = document.getElementById("categoryFilter");
+  const categoryFilter = document.getElementById("categoryFilter");
+  
+  // Extract unique categories using Set
+  const categories = [...new Set(quotes.map(quote => quote.category))];
 
-    // Get unique categories from quote array
-    const uniqueCategories = [...new Set(quotes.map(q => q.category))];
+  // Reset and add default "All Categories"
+  categoryFilter.innerHTML = '<option value="all">All Categories</option>';
 
-    // Reset dropdown and add 'All Categories' as default
-    categoryFilter.innerHTML = `<option value="all">All Categories</option>`;
+  // Append each unique category to the dropdown
+  categories.forEach(category => {
+    const option = document.createElement("option");
+    option.value = category;
+    option.textContent = category;
+    categoryFilter.appendChild(option);
+  });
 
-    // Create and append options dynamically
-    uniqueCategories.forEach(cat => {
-        const option = document.createElement("option");
-        option.value = cat;
-        option.textContent = cat;
-        categoryFilter.appendChild(option);
-    });
+  // Restore and apply last selected category from localStorage
+  const savedCategory = localStorage.getItem("selectedCategory");
+  if (savedCategory && categoryExists(savedCategory)) {
+    categoryFilter.value = savedCategory;
+  }
 
-    // Restore last selected category from localStorage if it exists
-    const savedCategory = localStorage.getItem("selectedCategory");
-    if (savedCategory && [...categoryFilter.options].some(opt => opt.value === savedCategory)) {
-        categoryFilter.value = savedCategory;
-    }
-
-    // Apply the selected filter on load
-    filterQuotes();
+  filterQuotes();
 }
 
-// Filter and display quotes based on the selected category
+// Check if the selected category still exists in the dropdown
+function categoryExists(category) {
+  const options = document.querySelectorAll("#categoryFilter option");
+  return [...options].some(option => option.value === category);
+}
+
+// Filter quotes based on the selected category and display them
 function filterQuotes() {
-    const selectedCategory = document.getElementById("categoryFilter").value;
+  const selected = document.getElementById("categoryFilter").value;
 
-    // Save current selection to localStorage
-    localStorage.setItem("selectedCategory", selectedCategory);
+  // Save selection to localStorage
+  localStorage.setItem("selectedCategory", selected);
 
-    // Filter quotes based on selected category
-    const filteredQuotes = selectedCategory === "all"
-        ? quotes
-        : quotes.filter(q => q.category === selectedCategory);
+  // Filter or show all quotes
+  const filtered = selected === "all"
+    ? quotes
+    : quotes.filter(quote => quote.category === selected);
 
-    // Display filtered results
-    displayQuotes(filteredQuotes);
+  displayQuotes(filtered);
 }
 
-// Render quotes to the page
-function displayQuotes(list) {
-    const container = document.getElementById("quoteContainer");
-    container.innerHTML = "";
+// Render the filtered quotes in the quoteContainer
+function displayQuotes(quoteList) {
+  const container = document.getElementById("quoteContainer");
+  container.innerHTML = ""; // Clear previous quotes
 
-    // Show message if no quotes exist for selected category
-    if (list.length === 0) {
-        container.innerHTML = "<p>No quotes in this category.</p>";
-        return;
-    }
+  if (quoteList.length === 0) {
+    container.textContent = "No quotes in this category.";
+    return;
+  }
 
-    // Loop through and render each quote
-    list.forEach(q => {
-        const el = document.createElement("div");
-        el.className = "quote";
-        el.innerHTML = `<strong>"${q.text}"</strong> <em>[${q.category}]</em>`;
-        container.appendChild(el);
-    });
+  quoteList.forEach(({ text, category }) => {
+    const div = document.createElement("div");
+    div.className = "quote";
+    div.innerHTML = `<strong>"${text}"</strong> <em>[${category}]</em>`;
+    container.appendChild(div);
+  });
 }
 
-// Add a new quote and update categories and view
+// Add a new quote from user input and update UI
 function addQuote() {
-    const text = document.getElementById("newQuote").value.trim();
-    const category = document.getElementById("newCategory").value.trim();
+  const quoteInput = document.getElementById("newQuote");
+  const categoryInput = document.getElementById("newCategory");
+  const text = quoteInput.value.trim();
+  const category = categoryInput.value.trim();
 
-    // Validate input
-    if (!text || !category) {
-        return alert("Please enter both a quote and category.");
-    }
+  if (!text || !category) {
+    alert("Please enter both a quote and a category.");
+    return;
+  }
 
-    // Add the new quote to the array
-    quotes.push({ text, category });
+  // Add new quote to array
+  quotes.push({ text, category });
 
-    // Clear input fields
-    document.getElementById("newQuote").value = "";
-    document.getElementById("newCategory").value = "";
+  // Clear input fields
+  quoteInput.value = "";
+  categoryInput.value = "";
 
-    // Refresh categories and quotes
-    populateCategories();
+  // Refresh categories and quote display
+  populateCategories();
 }
 
-// Run when page loads
+// Initialize the app on page load
 window.onload = populateCategories;
