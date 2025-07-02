@@ -1,147 +1,65 @@
-const quoteText = document.getElementById("quote-text");
-const quoteAuthor = document.getElementById("quote-author");
-const nextQuoteBtn = document.getElementById("next-quote");
-const syncNotice = document.getElementById("sync-notice");
+// Quotes array with text and category
+let quotes = [
+  { text: "The only limit is your mind.", category: "Motivation" },
+  { text: "Simplicity is the soul of efficiency.", category: "Productivity" },
+  { text: "Life is what happens when you’re busy making other plans.", category: "Life" },
+  // Add more quotes as needed
+];
 
-const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
+// Extract unique categories and populate the <select>:
+function populateCategories() {
+  const dropdown = document.getElementById('categoryFilter');
+  const categories = ['all', ...new Set(quotes.map(q => q.category))];
 
-// Initial load
-let localQuotes = JSON.parse(localStorage.getItem("quotes") || "[]");
-let currentIndex = 0;
+  dropdown.innerHTML = categories.map(cat =>
+    `<option value="${cat}">${cat}</option>`
+  ).join('');
 
-function displayQuote(index) {
-  if (localQuotes.length > 0 && localQuotes[index]) {
-    const quote = localQuotes[index];
-    quoteText.textContent = quote.text;
-    quoteAuthor.textContent = `— ${quote.author}`;
-  }
+  // Restore selected category from localStorage
+  const savedCategory = localStorage.getItem('selectedCategory') || 'all';
+  dropdown.value = savedCategory;
+  filterQuotes(); // Initial filter
 }
 
-function nextQuote() {
-  currentIndex = (currentIndex + 1) % localQuotes.length;
-  displayQuote(currentIndex);
+// Filter and display quotes according to the selected category:
+function filterQuotes() {
+  const selectedCategory = document.getElementById('categoryFilter').value;
+  localStorage.setItem('selectedCategory', selectedCategory);
+
+  const filtered = selectedCategory === 'all'
+    ? quotes
+    : quotes.filter(q => q.category === selectedCategory);
+
+  const container = document.getElementById('quotesContainer');
+  container.innerHTML = filtered.map(q =>
+    `<div class="quote">${q.text} <em>(${q.category})</em></div>`
+  ).join('');
 }
 
-// Fetch from server
-
-async function fetchQuotesFromServer() {
-  try {
-    const response = await fetch(SERVER_URL);
-    if (!response.ok) {
-      throw new Error(`Server error: ${response.status}`);
-    }
-    const posts = await response.json();
-
-    // Simulate quotes from the posts
-    const quotes = posts.slice(0, 10).map(post => ({
-      id: post.id,
-      text: post.body,
-      author: `User ${post.userId}`,
-      updatedAt: new Date().toISOString() // simulate recent updates
-    }));
-
-    return quotes;
-  } catch (error) {
-    console.error("Failed to fetch quotes from server:", error);
-    return [];
-  }
+// Render quotes dynamically:
+function displayQuotes(filtered) {
+  const container = document.getElementById("quoteContainer");
+  container.innerHTML = filtered.map(q => `<p>${q.text}</p>`).join("");
 }
 
+// When adding a new quote, update both the array and dropdown:
+function addQuote(text, category) {
+  quotes.push({ text, category });
 
+  // If new category, repopulate dropdown
+  const existingCategories = new Set(quotes.map(q => q.category));
+  const dropdown = document.getElementById('categoryFilter');
+  const options = [...dropdown.options].map(opt => opt.value);
 
-function mergeQuotes(serverQuotes) {
-  const updated = [];
-  const localMap = new Map(localQuotes.map(q => [q.id, q]));
-
-  serverQuotes.forEach(serverQuote => {
-    const local = localMap.get(serverQuote.id);
-    if (!local || new Date(serverQuote.updatedAt) > new Date(local.updatedAt)) {
-      updated.push(serverQuote); // server wins
-    } else {
-      updated.push(local);
-    }
-    localMap.delete(serverQuote.id);
-  });
-
-  // Add any local-only quotes
-  for (const remaining of localMap.values()) {
-    updated.push(remaining);
+  if (!options.includes(category)) {
+    populateCategories(); // Resync category list
   }
 
-  localStorage.setItem("quotes", JSON.stringify(updated));
-  localQuotes = updated;
-  currentIndex = 0;
-  displayQuote(currentIndex);
-  showSyncNotice();
+  filterQuotes(); // Show latest quotes
 }
 
-function showSyncNotice() {
-  syncNotice.textContent = "Quotes synced with server!";
-  syncNotice.classList.remove("hidden");
-  setTimeout(() => syncNotice.classList.add("hidden"), 4000);
-}
+window.onload = () => {
+  populateCategories();
+};
 
-// Periodic sync every 10 seconds
-setInterval(syncQuotes, 10000);
-
-
-// Initialize app
-if (localQuotes.length > 0) {
-  displayQuote(currentIndex);
-} else {
-  syncQuotes(); // pulls from server and updates local
-}
-
-
-async function postQuoteToServer(quote) {
-  try {
-    const response = await fetch(SERVER_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(quote)
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to post quote: ${response.status}`);
-    }
-
-    const savedQuote = await response.json();
-    console.log("Quote posted:", savedQuote);
-    return savedQuote;
-  } catch (error) {
-    console.error("Error posting quote:", error);
-  }
-}
-document.getElementById("submit-quote").addEventListener("click", async () => {
-  const text = document.getElementById("new-quote-text").value.trim();
-  const author = document.getElementById("new-quote-author").value.trim();
-
-  if (!text || !author) return alert("Please enter both text and author.");
-
-  const newQuote = {
-    text,
-    author,
-    updatedAt: new Date().toISOString()
-  };
-
-  const posted = await postQuoteToServer(newQuote);
-
-  // Optional: Update local storage with new quote
-  if (posted) {
-    localQuotes.push(posted);
-    localStorage.setItem("quotes", JSON.stringify(localQuotes));
-    displayQuote(localQuotes.length - 1);
-  }
-});
-async function syncQuotes() {
-  try {
-    const serverQuotes = await fetchQuotesFromServer();
-    mergeQuotes(serverQuotes);
-  } catch (error) {
-    console.warn("Quote sync failed:", error);
-  }
-}
-
-nextQuoteBtn.addEventListener("click", nextQuote);
+ 
