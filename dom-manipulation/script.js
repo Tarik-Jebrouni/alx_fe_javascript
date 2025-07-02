@@ -1,56 +1,71 @@
-// Tableau global des citations
+// Sample quotes array
 const quotes = [
-  { text: "La seule limite, c'est votre esprit.", category: "Motivation" },
-  { text: "La vie est ce qui se passe quand on fait d'autres projets.", category: "Vie" },
-  { text: "Le savoir est une arme.", category: "Éducation" }
+  { text: "Your limitation—it’s only your imagination.", category: "Motivation" },
+  { text: "Push yourself, because no one else is going to do it for you.", category: "Motivation" },
+  { text: "Learning never exhausts the mind.", category: "Education" },
+  { text: "Life is short, and it's up to you to make it sweet.", category: "Life" }
 ];
 
-// Fonction pour remplir dynamiquement le menu des catégories
-function populateCategories() {
-  const select = document.getElementById('categoryFilter');
-  const categories = [...new Set(quotes.map(q => q.category))]; // Catégories uniques
+// Select DOM elements
+const categorySelect = document.getElementById("categoryFilter");
+const quoteContainer = document.getElementById("quoteContainer");
 
-  // Réinitialiser les options sauf "Toutes les catégories"
-  select.innerHTML = '<option value="all">Toutes les catégories</option>';
+// Populate the category dropdown
+function populateCategoryOptions() {
+  const uniqueCategories = Array.from(new Set(quotes.map(q => q.category)));
 
-  // Ajouter les catégories
-  categories.forEach(category => {
-    const option = document.createElement('option');
+  // Clear existing options
+  categorySelect.innerHTML = '';
+
+  // Add default 'All' option
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "all";
+  defaultOption.textContent = "All Categories";
+  categorySelect.appendChild(defaultOption);
+
+  // Add unique category options
+  uniqueCategories.forEach(category => {
+    const option = document.createElement("option");
     option.value = category;
     option.textContent = category;
-    select.appendChild(option);
+    categorySelect.appendChild(option);
   });
 
-  // Rétablir la catégorie précédemment sélectionnée
-  const savedCategory = localStorage.getItem('selectedCategory');
+  // Restore previously selected category from localStorage
+  const savedCategory = localStorage.getItem("selectedCategory");
   if (savedCategory) {
-    select.value = savedCategory;
+    categorySelect.value = savedCategory;
   }
 
-  // Afficher les citations correspondantes
-  filterQuotes();
+  // Display quotes for the selected category
+  displayFilteredQuotes();
 }
 
-// Fonction pour filtrer et afficher les citations
-function filterQuotes() {
-  const selectedCategory = document.getElementById('categoryFilter').value;
-  localStorage.setItem('selectedCategory', selectedCategory); // Sauvegarder le filtre
+// Filter and display quotes
+function displayFilteredQuotes() {
+  const selectedCategory = categorySelect.value;
 
-  const container = document.getElementById('quoteContainer');
-  container.innerHTML = ''; // Nettoyer l'affichage
+  // Save selection to localStorage
+  localStorage.setItem("selectedCategory", selectedCategory);
 
-  const filtered = selectedCategory === 'all'
+  // Filter quotes
+  const visibleQuotes = selectedCategory === "all"
     ? quotes
-    : quotes.filter(q => q.category === selectedCategory);
+    : quotes.filter(quote => quote.category === selectedCategory);
 
-  filtered.forEach(quote => {
-    const p = document.createElement('p');
-    p.textContent = quote.text;
-    container.appendChild(p);
+  // Clear the display
+  quoteContainer.innerHTML = '';
+
+  // Render filtered quotes
+  visibleQuotes.forEach(({ text }) => {
+    const quoteElement = document.createElement("p");
+    quoteElement.textContent = text;
+    quoteContainer.appendChild(quoteElement);
   });
 }
 
-// Initialisation au chargement de la page
-window.onload = () => {
-  populateCategories();
-};
+// Initialize on page load
+window.addEventListener("DOMContentLoaded", () => {
+  populateCategoryOptions();
+  categorySelect.addEventListener("change", displayFilteredQuotes);
+});
