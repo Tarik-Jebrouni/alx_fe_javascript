@@ -53,6 +53,7 @@ function filterQuotes() {
   displayQuotes(filtered);
 }
 
+
 // Render the filtered quotes in the quoteContainer
 function displayQuotes(quoteList) {
   const container = document.getElementById("quoteContainer");
